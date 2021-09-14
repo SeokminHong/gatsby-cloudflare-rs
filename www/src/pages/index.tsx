@@ -127,6 +127,19 @@ const links = [
 
 // markup
 const IndexPage = () => {
+  const [user, setUser] = React.useState(null);
+  const fetchUser = React.useCallback(async () => {
+    const search = new URLSearchParams(location.search);
+    await fetch(`https://api.github.com/user`, {
+      headers: {
+        Accept: `application/vnd.github.v3+json`,
+        Authorization: `token ${search.get("token")}`,
+      },
+    })
+      .then((res) => res.json())
+      .then((res) => setUser(res));
+  }, []);
+
   return (
     <main style={pageStyles}>
       <title>Home Page</title>
@@ -144,6 +157,15 @@ const IndexPage = () => {
         <span role="img" aria-label="Sunglasses smiley emoji">
           😎
         </span>
+      </p>
+      <p>
+        <div>
+          <a href="https://gh-auth.seokmin.workers.dev">Login</a>
+        </div>
+        <div>
+          <button onClick={fetchUser}>Fetch User</button>
+        </div>
+        <div>{user ? JSON.stringify(user, null, 2) : "null"}</div>
       </p>
       <ul style={listStyles}>
         <li style={docLinkStyle}>
