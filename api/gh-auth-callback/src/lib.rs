@@ -1,3 +1,4 @@
+use serde::*;
 use worker::*;
 
 mod utils;
@@ -13,6 +14,13 @@ fn log_request(req: &Request) {
         req.cf().coordinates().unwrap_or_default(),
         req.cf().region().unwrap_or_else(|| "unknown region".into())
     );
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+struct ResponseType {
+    access_token: String,
+    scope: String,
+    token_type: String,
 }
 
 #[event(fetch)]
@@ -61,12 +69,17 @@ pub async fn main(req: Request, env: Env) -> Result<Response> {
     let headers = request.headers_mut()?;
     headers.set("Accept", "application/json")?;
     headers.set("User-Agent", "GitActivity 1.0")?;
-    let response = Fetch::Request(request).send().await?.text().await?;
+    let mut response = Fetch::Request(request).send().await?;
+    let ResponseType {
+        access_token,
+        token_type: _,
+        scope: _,
+    } = response.json().await?;
 
     let mut headers = Headers::new();
     headers.set(
         "Location",
-        format!("{}?token={}", callback_url.to_string(), response).as_str(),
+        format!("{}?token={}", callback_url.to_string(), access_token).as_str(),
     )?;
     let response = Response::empty()?.with_status(302).with_headers(headers);
 
