@@ -1,8 +1,5 @@
 use worker::*;
 
-use path::get_queries;
-
-mod path;
 mod utils;
 
 const GITHUB_URL: &str = "https://github.com";
@@ -26,8 +23,8 @@ pub async fn main(req: Request, env: Env) -> Result<Response> {
     utils::set_panic_hook();
 
     let (client_id, client_secret, callback_url) = match (
-        env.secret("CLIENT_ID"),
-        env.secret("CLIENT_SECRET"),
+        env.secret("GITHUB_CLIENT_ID"),
+        env.secret("GITHUB_CLIENT_SECRET"),
         env.secret("CALLBACK_URL"),
     ) {
         (Ok(client_id), Ok(client_secret), Ok(callback_url)) => {
@@ -35,11 +32,18 @@ pub async fn main(req: Request, env: Env) -> Result<Response> {
         }
         _ => return Err(Error::Internal("Missing secrets".into())),
     };
-    let path = req.path();
-    let queries = get_queries(&path);
-    let code = match queries.get("code") {
-        Some(Some(c)) => *c,
-        _ => return Err(Error::Internal("Missing code".into())),
+
+    let url = req.url()?;
+    let queries = url.query_pairs();
+    let mut code = None;
+    for (key, value) in queries {
+        if key == "code" {
+            code = Some(value)
+        }
+    }
+    let code = match code {
+        Some(code) => code,
+        None => return Err(Error::Internal("Missing code".into())),
     };
 
     let mut request = Request::new(
