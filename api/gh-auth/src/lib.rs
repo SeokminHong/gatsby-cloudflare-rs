@@ -17,7 +17,7 @@ fn log_request(req: &Request) {
     );
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Deserialize, Debug)]
 struct ResponseType {
     access_token: String,
     scope: String,
@@ -31,10 +31,9 @@ struct ResponseType {
 fn get_code(env: Env) -> Result<Response> {
     // Get environment variable.
     let client_id = match env.secret("GITHUB_CLIENT_ID") {
-        Ok(id) => id,
+        Ok(id) => id.to_string(),
         Err(_) => return Err(Error::Internal("GITHUB_CLIENT_ID not set".into())),
-    }
-    .to_string();
+    };
 
     let url = format!("{}{}?client_id={}", GITHUB_URL, AUTH_PATH, client_id);
 
@@ -62,17 +61,15 @@ async fn exchange_token(req: Request, env: Env) -> Result<Response> {
     };
 
     // Get `code` query.
-    let url = req.url()?;
-    let mut code = None;
-    for (key, value) in url.query_pairs() {
-        if key == "code" {
-            code = Some(value);
-            break;
-        }
-    }
+    let code = req
+        .url()?
+        .query_pairs()
+        .find(|(key, _)| key == "code")
+        .map(|(_, value)| value.to_string());
+
     let code = match code {
         Some(code) => code,
-        None => return Response::error("Missing code", 401),
+        None => return Response::error("Missing code", 401), // 401 UNAUTHORIZED
     };
 
     // Request a token.
@@ -90,11 +87,7 @@ async fn exchange_token(req: Request, env: Env) -> Result<Response> {
     let mut response = Fetch::Request(request).send().await?;
 
     // Deserialize response.
-    let ResponseType {
-        access_token,
-        token_type: _,
-        scope: _,
-    } = response.json().await?;
+    let ResponseType { access_token, .. } = response.json().await?;
 
     // Redirect to a success page.
     let mut headers = Headers::new();
