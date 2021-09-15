@@ -13,7 +13,7 @@ It's _blazingly_ fast and there's _no cold-start overhead_.
 1. Make an OAuth2 application on GitHub.
 2. Deploy the frontend without environment variables.
 3. Deploy the workers.
-4. Add the API URL to the frontend and rebuild it.
+4. Add the API URL to the frontend's environment variable, `GATSBY_GITHUB_API`, and rebuild it.
 
 ## References
 
