@@ -67,7 +67,7 @@ const IndexPage = () => {
               </div>
             </>
           ) : (
-            <a href="https://gh-auth.seokmin.workers.dev">Login</a>
+            <a href={process.env['GATSBY_GITHUB_API']}>Login</a>
           )}
         </div>
       </p>

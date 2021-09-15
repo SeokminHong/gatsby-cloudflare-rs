@@ -12,10 +12,13 @@ const PageContext = React.createContext<PageContextType>({
   setUser: (_) => {},
 });
 
-export const PageProvider = ({ children }) => {
+export const PageProvider: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
   const [user, setUser] = React.useState(() => {
     if (typeof window !== 'undefined') {
-      return JSON.parse(sessionStorage.getItem(GITHUB_USER_KEY));
+      const user = sessionStorage.getItem(GITHUB_USER_KEY);
+      return user ? JSON.parse(user) : null;
     }
     return null;
   });
