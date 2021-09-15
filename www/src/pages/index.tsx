@@ -55,7 +55,7 @@ const IndexPage = () => {
               <div>
                 <img
                   src={user.avatar_url}
-                  alt={user.name}
+                  alt="User avatar"
                   width="32px"
                   height="32px"
                   style={{ borderRadius: `16px` }}
@@ -70,6 +70,11 @@ const IndexPage = () => {
             <a href={process.env['GATSBY_GITHUB_API']}>Login</a>
           )}
         </div>
+      </p>
+      <p>
+        <a href="https://github.com/SeokminHong/gatsby-cloudflare-rs">
+          Repository
+        </a>
       </p>
       <img
         alt="Gatsby G Logo"

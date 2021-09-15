@@ -1,8 +1,19 @@
 # Gatsby + Cloudflare Workers + Rust
 
-A simple implementation for GitHub OAuth2 authentication using Cloudflare Workers and Rust.
+A simple implementation for GitHub OAuth2 authentication using [Cloudflare Workers](https://workers.cloudflare.com) and Rust.
+
+It's _blazingly_ fast and there's _no cold-start overhead_.
+
+![CPU time metrics](./images/cloudflare-workers-cpu-metrics.png)
 
 [demo](https://gatsby-cloudflare-rs.pages.dev/)
+
+## Setup
+
+1. Make an OAuth2 application on GitHub.
+2. Deploy the frontend without environment variables.
+3. Deploy the workers.
+4. Add the API URL to the frontend and rebuild it.
 
 ## References
 
