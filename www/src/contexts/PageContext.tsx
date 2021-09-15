@@ -15,7 +15,7 @@ const PageContext = React.createContext<PageContextType>({
 export const PageProvider = ({ children }) => {
   const [user, setUser] = React.useState(() => {
     if (typeof window !== 'undefined') {
-      return sessionStorage.getItem(GITHUB_USER_KEY);
+      return JSON.parse(sessionStorage.getItem(GITHUB_USER_KEY));
     }
     return null;
   });
@@ -26,7 +26,7 @@ export const PageProvider = ({ children }) => {
         setUser: (user) => {
           setUser(user);
           if (user) {
-            sessionStorage.setItem(GITHUB_USER_KEY, user);
+            sessionStorage.setItem(GITHUB_USER_KEY, JSON.stringify(user));
           } else {
             sessionStorage.removeItem(GITHUB_USER_KEY);
           }
