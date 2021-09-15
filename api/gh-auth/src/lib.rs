@@ -36,12 +36,7 @@ fn get_code(env: Env) -> Result<Response> {
     }
     .to_string();
 
-    let url = format!(
-        "{}{}?client_id={}",
-        GITHUB_URL,
-        AUTH_PATH,
-        client_id.to_string()
-    );
+    let url = format!("{}{}?client_id={}", GITHUB_URL, AUTH_PATH, client_id);
 
     let mut headers = Headers::new();
     // Location to redirect.
@@ -124,7 +119,7 @@ pub async fn main(req: Request, env: Env) -> Result<Response> {
     let router = Router::new(());
 
     router
-        .get_async("/", |_, ctx| async move { get_code(ctx.get_env()) })
+        .get("/", |_, ctx| get_code(ctx.get_env()))
         .get_async("/redirect", |req, ctx| async move {
             exchange_token(req, ctx.get_env()).await
         })
